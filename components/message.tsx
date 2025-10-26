@@ -8,6 +8,7 @@ import { Markdown } from "./markdown";
 import { ToolInvocation } from "ai";
 import { Orders } from "./orders";
 import { Tracker } from "./tracker";
+import { parseUICPContent, hasUICPBlocks } from "@/lib/uicp/parser";
 
 export const TextStreamMessage = ({
   content,
@@ -28,7 +29,18 @@ export const TextStreamMessage = ({
 
       <div className="flex flex-col gap-1 w-full">
         <div className="text-zinc-800 dark:text-zinc-300 flex flex-col gap-4">
-          <Markdown>{text}</Markdown>
+          {text && hasUICPBlocks(text) ? (
+            <>
+              {parseUICPContent(text).map((parsedItem) => {
+                if (parsedItem.type === 'component') {
+                  return <div key={parsedItem.key}>{parsedItem.content}</div>;
+                }
+                return <Markdown key={parsedItem.key}>{parsedItem.content as string}</Markdown>;
+              })}
+            </>
+          ) : (
+            <Markdown>{text}</Markdown>
+          )}
         </div>
       </div>
     </motion.div>
@@ -57,7 +69,18 @@ export const Message = ({
       <div className="flex flex-col gap-6 w-full">
         {content && (
           <div className="text-zinc-800 dark:text-zinc-300 flex flex-col gap-4">
-            <Markdown>{content as string}</Markdown>
+            {typeof content === 'string' && hasUICPBlocks(content) ? (
+              <>
+                {parseUICPContent(content).map((parsedItem) => {
+                  if (parsedItem.type === 'component') {
+                    return <div key={parsedItem.key}>{parsedItem.content}</div>;
+                  }
+                  return <Markdown key={parsedItem.key}>{parsedItem.content as string}</Markdown>;
+                })}
+              </>
+            ) : (
+              <Markdown>{content as string}</Markdown>
+            )}
           </div>
         )}
 
@@ -65,6 +88,31 @@ export const Message = ({
           <div className="flex flex-col gap-4">
             {toolInvocations.map((toolInvocation) => {
               const { toolName, toolCallId, state } = toolInvocation;
+
+              // Show status message while tool is being called
+              if (state === "call") {
+                const { args } = toolInvocation;
+                
+                // Generate status message based on tool type
+                let statusMessage = "Working...";
+                
+                if (toolName === "GoogleSearch_Search" && args.query) {
+                  statusMessage = `Searching for "${args.query}"...`;
+                } else if (toolName.includes("Search")) {
+                  statusMessage = args.query 
+                    ? `Searching for "${args.query}"...`
+                    : "Searching...";
+                }
+
+                return (
+                  <div 
+                    key={toolCallId}
+                    className="flex items-center gap-2 text-sm text-zinc-500 dark:text-zinc-400 italic"
+                  >
+                    <span>{statusMessage}</span>
+                  </div>
+                );
+              }
 
               if (state === "result") {
                 const { result } = toolInvocation;
@@ -81,6 +129,8 @@ export const Message = ({
                   </div>
                 );
               }
+              
+              return null;
             })}
           </div>
         )}

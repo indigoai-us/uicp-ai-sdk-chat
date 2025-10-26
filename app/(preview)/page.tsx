@@ -4,12 +4,49 @@ import { useRef } from "react";
 import { Message } from "@/components/message";
 import { useScrollToBottom } from "@/components/use-scroll-to-bottom";
 import { motion } from "framer-motion";
-import { MasonryIcon, VercelIcon } from "@/components/icons";
+import { MasonryIcon, VercelIcon, BotIcon } from "@/components/icons";
 import Link from "next/link";
 import { useChat } from "ai/react";
 
 export default function Home() {
-  const { messages, handleSubmit, input, setInput, append } = useChat();
+  const { messages, handleSubmit, input, setInput, append, isLoading } = useChat();
+  
+  // Filter out empty messages and messages with only UICP tool invocations
+  const visibleMessages = messages.filter((message) => {
+    // Always show user messages
+    if (message.role === "user") return true;
+    
+    // Show assistant messages that have content
+    if (message.content && message.content.trim() !== "") return true;
+    
+    // For messages with tool invocations but no content
+    if (message.toolInvocations && message.toolInvocations.length > 0) {
+      // Check if there are any non-UICP tools
+      const hasVisibleTools = message.toolInvocations.some(tool => {
+        // UICP tools are internal - don't show messages that only have these
+        const isUICPTool = tool.toolName === 'get_ui_components' || 
+                          tool.toolName === 'create_ui_component';
+        
+        if (isUICPTool) return false;
+        
+        // Show messages with search tools in "call" state (for status)
+        if (tool.state === 'call') return true;
+        
+        // Show messages with visual tool results
+        if (tool.state === 'result') {
+          return tool.toolName === 'listOrders' || 
+                 tool.toolName === 'viewTrackingInformation';
+        }
+        
+        return false;
+      });
+      
+      return hasVisibleTools;
+    }
+    
+    // Hide empty messages
+    return false;
+  });
 
   const inputRef = useRef<HTMLInputElement>(null);
   const [messagesContainerRef, messagesEndRef] =
@@ -17,14 +54,14 @@ export default function Home() {
 
   const suggestedActions = [
     {
-      title: "Where is",
-      label: "my watch?",
-      action: "where is my watch?",
+      title: "Warriors game score",
+      label: "last game",
+      action: "What was the score of the last Warriors game?",
     },
     {
-      title: "What orders",
-      label: "have shipped?",
-      action: "what orders have shipped?",
+      title: "News articles",
+      label: "about AI",
+      action: "Please find me 3 news articles about AI from the last week.",
     },
   ];
 
@@ -35,7 +72,7 @@ export default function Home() {
           ref={messagesContainerRef}
           className="flex flex-col gap-6 h-full w-dvw items-center overflow-y-scroll"
         >
-          {messages.length === 0 && (
+          {visibleMessages.length === 0 && (
             <motion.div className="h-[350px] px-4 w-full md:w-[500px] md:px-0 pt-20">
               <div className="border rounded-lg p-6 flex flex-col gap-4 text-zinc-500 text-sm dark:text-zinc-400 dark:border-zinc-700">
                 <p className="flex flex-row justify-center gap-4 items-center text-zinc-900 dark:text-zinc-50">
@@ -64,7 +101,7 @@ export default function Home() {
             </motion.div>
           )}
 
-          {messages.map((message) => (
+          {visibleMessages.map((message) => (
             <Message
               key={message.id}
               role={message.role}
@@ -72,6 +109,23 @@ export default function Home() {
               toolInvocations={message.toolInvocations}
             ></Message>
           ))}
+          
+          {/* Show "Thinking..." when loading and no visible assistant response yet */}
+          {isLoading && !visibleMessages.some(m => m.role === 'assistant' && (m.content || m.toolInvocations?.length)) && (
+            <motion.div
+              className="flex flex-row gap-4 px-4 w-full md:w-[500px] md:px-0"
+              initial={{ y: 5, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+            >
+              <div className="size-[24px] flex flex-col justify-center items-center flex-shrink-0 text-zinc-400">
+                <BotIcon />
+              </div>
+              <div className="flex items-center gap-2 text-sm text-zinc-500 dark:text-zinc-400 italic">
+                <span>Thinking...</span>
+              </div>
+            </motion.div>
+          )}
+          
           <div ref={messagesEndRef} />
         </div>
 
