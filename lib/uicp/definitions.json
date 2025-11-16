@@ -117,6 +117,171 @@
           "timeRemaining": "Final"
         }
       }
+    },
+    {
+      "uid": "BarChart",
+      "type": "chart",
+      "description": "A component for displaying data as a bar chart with customizable colors, legend, grid, and tooltip",
+      "componentPath": "components/bar-chart",
+      "inputs": {
+        "title": {
+          "type": "string",
+          "description": "Title of the chart (optional)",
+          "required": false
+        },
+        "description": {
+          "type": "string",
+          "description": "Description or subtitle of the chart (optional)",
+          "required": false
+        },
+        "data": {
+          "type": "array",
+          "description": "Array of data points. Each point must have a 'category' field and any number of data fields",
+          "required": true
+        },
+        "dataKeys": {
+          "type": "array",
+          "description": "Array of field names to display as bars (e.g., ['desktop', 'mobile'])",
+          "required": true
+        },
+        "categoryKey": {
+          "type": "string",
+          "description": "Field name to use for X-axis categories (default: 'category')",
+          "required": false,
+          "default": "category"
+        },
+        "colors": {
+          "type": "array",
+          "description": "Array of color hex codes for bars (optional, uses default colors if not provided)",
+          "required": false
+        },
+        "showGrid": {
+          "type": "boolean",
+          "description": "Whether to show grid lines (default: true)",
+          "required": false,
+          "default": true
+        },
+        "showLegend": {
+          "type": "boolean",
+          "description": "Whether to show legend (default: true)",
+          "required": false,
+          "default": true
+        },
+        "showTooltip": {
+          "type": "boolean",
+          "description": "Whether to show tooltip on hover (default: true)",
+          "required": false,
+          "default": true
+        },
+        "height": {
+          "type": "string",
+          "description": "Height of the chart (e.g., '350px', '400px') (default: '350px')",
+          "required": false,
+          "default": "350px"
+        }
+      },
+      "example": {
+        "uid": "BarChart",
+        "data": {
+          "title": "Website Traffic",
+          "description": "Monthly visitors by device type",
+          "data": [
+            { "category": "January", "desktop": 186, "mobile": 80 },
+            { "category": "February", "desktop": 305, "mobile": 200 },
+            { "category": "March", "desktop": 237, "mobile": 120 },
+            { "category": "April", "desktop": 73, "mobile": 190 },
+            { "category": "May", "desktop": 209, "mobile": 130 },
+            { "category": "June", "desktop": 214, "mobile": 140 }
+          ],
+          "dataKeys": ["desktop", "mobile"]
+        }
+      }
+    },
+    {
+      "uid": "LineChart",
+      "type": "chart",
+      "description": "A component for displaying data as a line chart with customizable colors, legend, grid, and tooltip",
+      "componentPath": "components/line-chart",
+      "inputs": {
+        "title": {
+          "type": "string",
+          "description": "Title of the chart (optional)",
+          "required": false
+        },
+        "description": {
+          "type": "string",
+          "description": "Description or subtitle of the chart (optional)",
+          "required": false
+        },
+        "data": {
+          "type": "array",
+          "description": "Array of data points. Each point must have a 'category' field and any number of data fields",
+          "required": true
+        },
+        "dataKeys": {
+          "type": "array",
+          "description": "Array of field names to display as lines (e.g., ['desktop', 'mobile'])",
+          "required": true
+        },
+        "categoryKey": {
+          "type": "string",
+          "description": "Field name to use for X-axis categories (default: 'category')",
+          "required": false,
+          "default": "category"
+        },
+        "colors": {
+          "type": "array",
+          "description": "Array of color hex codes for lines (optional, uses default colors if not provided)",
+          "required": false
+        },
+        "showGrid": {
+          "type": "boolean",
+          "description": "Whether to show grid lines (default: true)",
+          "required": false,
+          "default": true
+        },
+        "showLegend": {
+          "type": "boolean",
+          "description": "Whether to show legend (default: true)",
+          "required": false,
+          "default": true
+        },
+        "showTooltip": {
+          "type": "boolean",
+          "description": "Whether to show tooltip on hover (default: true)",
+          "required": false,
+          "default": true
+        },
+        "height": {
+          "type": "string",
+          "description": "Height of the chart (e.g., '350px', '400px') (default: '350px')",
+          "required": false,
+          "default": "350px"
+        },
+        "curved": {
+          "type": "boolean",
+          "description": "Whether lines should be curved (default: true)",
+          "required": false,
+          "default": true
+        }
+      },
+      "example": {
+        "uid": "LineChart",
+        "data": {
+          "title": "Revenue Growth",
+          "description": "Monthly revenue over 6 months",
+          "data": [
+            { "category": "January", "revenue": 4500, "expenses": 3200 },
+            { "category": "February", "revenue": 5200, "expenses": 3400 },
+            { "category": "March", "revenue": 4800, "expenses": 3600 },
+            { "category": "April", "revenue": 6100, "expenses": 3800 },
+            { "category": "May", "revenue": 7200, "expenses": 4000 },
+            { "category": "June", "revenue": 8100, "expenses": 4200 }
+          ],
+          "dataKeys": ["revenue", "expenses"],
+          "curved": true
+        }
+      }
     }
   ]
 }

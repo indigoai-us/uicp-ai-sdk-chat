@@ -5,6 +5,8 @@ import definitions from './definitions.json';
 // This ensures they're bundled properly and available immediately
 import { NBAGameScore } from '@/components/nba-game-score';
 import { NewsArticlePreview } from '@/components/news-article-preview';
+import { BarChart } from '@/components/bar-chart';
+import { LineChart } from '@/components/line-chart';
 
 // Component registry - maps UIDs to React components
 // Components are registered based on definitions.json
@@ -12,6 +14,8 @@ const COMPONENT_REGISTRY: Record<string, React.ComponentType<any>> = {
   // Auto-populate based on definitions
   NBAGameScore: NBAGameScore,
   NewsArticlePreview: NewsArticlePreview,
+  BarChart: BarChart,
+  LineChart: LineChart,
 };
 
 export interface UICPBlock {
