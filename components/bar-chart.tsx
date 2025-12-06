@@ -94,7 +94,7 @@ export function BarChart({
             <ChartTooltip content={<ChartTooltipContent />} />
           )}
           {showLegend && (
-            <ChartLegend content={<ChartLegendContent />} />
+            <ChartLegend />
           )}
           {dataKeys.map((key, index) => (
             <Bar

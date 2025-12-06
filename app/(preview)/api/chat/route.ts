@@ -111,7 +111,7 @@ export async function POST(request: Request) {
     model: openai("gpt-4o"),
     system: `\
       You are a helpful AI assistant with access to various tools.
-
+      
       Today's date is ${new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}.
       
       CRITICAL INSTRUCTION:

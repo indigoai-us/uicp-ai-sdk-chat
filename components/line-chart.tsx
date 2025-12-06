@@ -96,7 +96,7 @@ export function LineChart({
             <ChartTooltip content={<ChartTooltipContent />} />
           )}
           {showLegend && (
-            <ChartLegend content={<ChartLegendContent />} />
+            <ChartLegend />
           )}
           {dataKeys.map((key, index) => (
             <Line
