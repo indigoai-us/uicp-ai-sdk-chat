@@ -8,7 +8,20 @@ import { Markdown } from "./markdown";
 import { ToolInvocation } from "ai";
 import { Orders } from "./orders";
 import { Tracker } from "./tracker";
-import { parseUICPContent, hasUICPBlocks } from "@/lib/uicp/parser";
+import { parseUICPContentSync, hasUICPBlocks, registerComponent } from "@uicp/parser";
+import definitions from "@/lib/uicp/definitions.json";
+
+// Import and register UICP components
+import { NBAGameScore } from "@/components/nba-game-score";
+import { NewsArticlePreview } from "@/components/news-article-preview";
+import { BarChart } from "@/components/bar-chart";
+import { LineChart } from "@/components/line-chart";
+
+// Register all UICP components
+registerComponent('NBAGameScore', NBAGameScore);
+registerComponent('NewsArticlePreview', NewsArticlePreview);
+registerComponent('BarChart', BarChart);
+registerComponent('LineChart', LineChart);
 
 export const TextStreamMessage = ({
   content,
@@ -31,7 +44,7 @@ export const TextStreamMessage = ({
         <div className="text-zinc-800 dark:text-zinc-300 flex flex-col gap-4">
           {text && hasUICPBlocks(text) ? (
             <>
-              {parseUICPContent(text).map((parsedItem) => {
+              {parseUICPContentSync(text, definitions as any).map((parsedItem) => {
                 if (parsedItem.type === 'component') {
                   return <div key={parsedItem.key}>{parsedItem.content}</div>;
                 }
@@ -71,7 +84,7 @@ export const Message = ({
           <div className="text-zinc-800 dark:text-zinc-300 flex flex-col gap-4">
             {typeof content === 'string' && hasUICPBlocks(content) ? (
               <>
-                {parseUICPContent(content).map((parsedItem) => {
+                {parseUICPContentSync(content, definitions as any).map((parsedItem) => {
                   if (parsedItem.type === 'component') {
                     return <div key={parsedItem.key}>{parsedItem.content}</div>;
                   }

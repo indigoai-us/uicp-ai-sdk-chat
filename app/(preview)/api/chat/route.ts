@@ -1,13 +1,14 @@
 import { getOrders, getTrackingInformation, ORDERS } from "@/components/data";
 import { openai } from "@ai-sdk/openai";
-import { streamText } from "ai";
+import { streamText, tool } from "ai";
 import { z } from "zod";
 import { Arcade } from "@arcadeai/arcadejs";
 import {
   toZodToolSet,
   executeOrAuthorizeZodTool,
 } from "@arcadeai/arcadejs/lib";
-import { uicpTools } from "@/lib/uicp/tools";
+import { getUIComponents, createUIComponent } from "@uicp/tools";
+import { resolve } from "path";
 
 // Configure which Arcade toolkits to load
 // Toolkit names should match the MCP Server names (e.g., "GoogleSearch", "Gmail", "Slack")
@@ -69,9 +70,34 @@ export async function POST(request: Request) {
   // Load Arcade tools
   const arcadeTools = await loadArcadeTools(userId);
 
-  // Define your custom tools
+  // Path to UICP definitions.json
+  const definitionsPath = resolve(process.cwd(), 'lib/uicp/definitions.json');
+
+  // Define your custom tools including UICP tools
   const customTools = {
-    ...uicpTools,
+    get_ui_components: tool({
+      description: 'Discover available UI components and their schemas',
+      parameters: z.object({
+        component_type: z.string().optional(),
+        uid: z.string().optional(),
+      }),
+      execute: async ({ component_type, uid }) => {
+        return await getUIComponents(definitionsPath, {
+          component_type,
+          uid,
+        });
+      },
+    }),
+    create_ui_component: tool({
+      description: 'Create a UICP block for rendering a UI component',
+      parameters: z.object({
+        uid: z.string(),
+        data: z.record(z.any()),
+      }),
+      execute: async ({ uid, data }) => {
+        return await createUIComponent(definitionsPath, { uid, data });
+      },
+    }),
   };
 
   // Merge custom tools with Arcade tools
